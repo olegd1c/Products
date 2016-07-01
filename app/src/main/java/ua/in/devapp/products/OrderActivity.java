@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -27,16 +26,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import ua.in.devapp.products.Api.Link;
-import ua.in.devapp.products.Api.MyRetrofit;
-import ua.in.devapp.products.View.CartListAdapter;
-import ua.in.devapp.products.View.OrderDetailsListAdapter;
+import ua.in.devapp.products.api.Link;
+import ua.in.devapp.products.api.MyRetrofit;
 import ua.in.devapp.products.models.Order;
 import ua.in.devapp.products.models.OrderDetailsContainer;
+import ua.in.devapp.products.view.CartListAdapter;
 
-/**
- * Created by o.dikhtyaruk on 16.06.2016.
- */
 public class OrderActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Gson gson;
@@ -55,7 +50,7 @@ public class OrderActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        ua.in.devapp.products.Error.RoboErrorReporter.bindReporter(this);
+        ua.in.devapp.products.error.RoboErrorReporter.bindReporter(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -70,15 +65,7 @@ public class OrderActivity extends AppCompatActivity implements View.OnClickList
         //myPicasso = new MyPicasso(this);
         try {
             intf = MyRetrofit.getLink(this);
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
+        } catch (KeyManagementException | CertificateException | NoSuchAlgorithmException | IOException | KeyStoreException e) {
             e.printStackTrace();
         }
         getOrder();
@@ -87,16 +74,15 @@ public class OrderActivity extends AppCompatActivity implements View.OnClickList
     // создание Footer
     View createHeader() {
         //int countFooter = lvData.getFooterViewsCount();
-        int visible = 1;
+        //int visible = 1;
         if (header == null) {
             header = getLayoutInflater().inflate(R.layout.header_order, null);
         }
 
 //        ((Button)footer.findViewById(R.id.btnSentOrder)).setOnClickListener(this);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (idOrder > 0) {
             Order order = repository.getOrder(idOrder);
-
 
             sb.append("Number: ").append(order.getNumber()).append('\n')
                     .append("Date: ").append(order.getDate()).append('\n')
@@ -110,22 +96,26 @@ public class OrderActivity extends AppCompatActivity implements View.OnClickList
         }
 
         ((TextView)header.findViewById(R.id.tvText)).setText(sb.toString());
-
+/*
         if (visible ==0){
             header.setVisibility(View.INVISIBLE);
         }
         else{
+
             header.setVisibility(View.VISIBLE);
         }
-
+        */
+        header.setVisibility(View.VISIBLE);
+        lvData.addHeaderView(header);
         //lvData.removeFooterView(footer);
         //lvData.removeAllViews();
+        /*
         if (visible > 0) {
             lvData.addHeaderView(header);
         }else{
             lvData.removeFooterView(header);
         }
-
+        */
         return header;
     }
 
@@ -135,7 +125,7 @@ public class OrderActivity extends AppCompatActivity implements View.OnClickList
 
 
         if(intf == null) return;
-        Map<String,String> map = new HashMap<String,String>();
+        Map<String, String> map = new HashMap<>();
         map.put("idOrder", Integer.toString(repository.getOrder(idOrder).getId()));
         //call = intf.getOrders(map);
         call = intf.getOrderDetails(map);

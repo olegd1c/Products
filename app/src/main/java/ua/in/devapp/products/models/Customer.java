@@ -1,8 +1,5 @@
 package ua.in.devapp.products.models;
 
-/**
- * Created by o.dikhtyaruk on 09.06.2016.
- */
 public class Customer {
     private String login;
     private String password;
@@ -14,6 +11,12 @@ public class Customer {
     private String email;
     private String phone;
     private Integer id;
+
+    public Customer(String email, String password) {
+        this.login = email;
+        this.email = email;
+        this.password = password;
+    }
 
     public String getLogin() {
         return login;

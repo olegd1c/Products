@@ -32,10 +32,10 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import ua.in.devapp.products.Api.Link;
-import ua.in.devapp.products.Api.MyRetrofit;
-import ua.in.devapp.products.View.CartListAdapter;
+import ua.in.devapp.products.api.Link;
+import ua.in.devapp.products.api.MyRetrofit;
 import ua.in.devapp.products.models.OrdersContainer;
+import ua.in.devapp.products.view.CartListAdapter;
 
 public class CartActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
@@ -53,7 +53,7 @@ public class CartActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        ua.in.devapp.products.Error.RoboErrorReporter.bindReporter(this);
+        ua.in.devapp.products.error.RoboErrorReporter.bindReporter(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_cart);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_cart);
@@ -77,10 +77,12 @@ public class CartActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        assert drawer != null;
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        assert navigationView != null;
         navigationView.setNavigationItemSelectedListener(this);
 
         //Button btnCart = (Button) findViewById(R.id.btnCart);
@@ -90,24 +92,16 @@ public class CartActivity extends AppCompatActivity
         //myPicasso = new MyPicasso(this);
         try {
             intf = MyRetrofit.getLink(this);
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
+        } catch (CertificateException | NoSuchAlgorithmException | IOException | KeyStoreException | KeyManagementException e) {
             e.printStackTrace();
         }
-
         getCart(1);
     }
 
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        assert drawer != null;
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -158,6 +152,7 @@ public class CartActivity extends AppCompatActivity
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        assert drawer != null;
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -215,7 +210,7 @@ public class CartActivity extends AppCompatActivity
         //call = intf.sentOrder(gson.toJson(repository.getCart()));
 
         //call = intf.postWithJson(repository.getCart());
-        call = intf.sentOrder(repository.getCart());
+        call = intf.sentOrder(Repository.getCart());
         //call = intf.sentOrder(gson.toJson(repository.getCart()));
 
 //        Map<String, String> param = new HashMap<String, String>();
@@ -252,7 +247,7 @@ public class CartActivity extends AppCompatActivity
                         String respBody = response.body().string();
                         OrdersContainer resp = gson.fromJson(respBody,OrdersContainer.class);//асинхронный вызов
                         if (resp.getSuccess() == 1 ) {
-                            repository.clearOrderDetails();
+                            Repository.clearOrderDetails();
                             getCart(0);
                             //CartActivity.this.recreate();
                         }
@@ -321,7 +316,7 @@ public class CartActivity extends AppCompatActivity
     View createFooter(String text) {
         View v = getLayoutInflater().inflate(R.layout.footer_cart, null);
         ((TextView)v.findViewById(R.id.tvText)).setText(text);
-        ((Button)v.findViewById(R.id.btnSentOrder)).setOnClickListener(this);
+        v.findViewById(R.id.btnSentOrder).setOnClickListener(this);
 
         return v;
     }

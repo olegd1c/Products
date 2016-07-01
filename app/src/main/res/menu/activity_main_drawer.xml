@@ -7,6 +7,10 @@
             android:icon="@drawable/ic_menu_camera"
             android:title="Main" />
         <item
+            android:id="@+id/signin"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="SignIn" />
+        <item
             android:id="@+id/cart"
             android:icon="@drawable/ic_menu_camera"
             android:title="Cart" />

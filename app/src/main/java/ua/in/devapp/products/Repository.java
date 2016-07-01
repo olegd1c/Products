@@ -1,18 +1,15 @@
 package ua.in.devapp.products;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import ua.in.devapp.products.models.Cart;
+import ua.in.devapp.products.models.Customer;
 import ua.in.devapp.products.models.Order;
 import ua.in.devapp.products.models.OrderDetails;
 import ua.in.devapp.products.models.Product;
 
-/**
- * Created by o.dikhtyaruk on 06.06.2016.
- */
 public class Repository {
     private static Repository rep = new Repository();
     //private static Context context;
@@ -49,7 +46,22 @@ public class Repository {
     }
 
     private static Cart cart = new Cart();
-    private static Map<Integer,Product> products = new HashMap<Integer,Product>();
+
+    public static Customer getCustomer() {
+        return customer;
+    }
+
+    public static void setCustomer(Customer customer) {
+        Repository.customer = customer;
+        if (customer != null) {
+            cart.setIdCustomer(customer.getId());
+        } else {
+            cart.setIdCustomer(null);
+        }
+    }
+
+    private static Customer customer;
+    private static Map<Integer, Product> products = new HashMap<>();
 
     public static Repository getInstance() {
         return rep;
@@ -77,8 +89,8 @@ public class Repository {
     public List<OrderDetails> getListOrderDetails() {
         //Map<Integer,OrderDetails> map = cart.getOrderDetails();
         //List<OrderDetails> list = new ArrayList<OrderDetails>(map.values());
-        ArrayList<OrderDetails> list = cart.getOrderDetails();
-        return list;
+        //ArrayList<OrderDetails> list = cart.getOrderDetails();
+        return cart.getOrderDetails();
     }
 
     public Integer getTotalSum() {

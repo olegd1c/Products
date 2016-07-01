@@ -7,17 +7,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.AppCompatButton;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -42,19 +42,19 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import ua.in.devapp.products.View.CartListAdapter;
-import ua.in.devapp.products.View.CustomListAdapter;
-import ua.in.devapp.products.View.OrdersListAdapter;
+import ua.in.devapp.products.api.Link;
+import ua.in.devapp.products.api.MyRetrofit;
 import ua.in.devapp.products.models.Cart;
-import ua.in.devapp.products.Api.Link;
-import ua.in.devapp.products.Api.MyRetrofit;
+import ua.in.devapp.products.models.Customer;
 import ua.in.devapp.products.models.OrdersContainer;
 import ua.in.devapp.products.models.Product;
 import ua.in.devapp.products.models.ProductsContainer;
+import ua.in.devapp.products.view.CartListAdapter;
+import ua.in.devapp.products.view.CustomListAdapter;
+import ua.in.devapp.products.view.OrdersListAdapter;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
-
 
     private Gson gson;
     private Retrofit retrofit;
@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        ua.in.devapp.products.Error.RoboErrorReporter.bindReporter(this);
+        ua.in.devapp.products.error.RoboErrorReporter.bindReporter(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity
        repository = Repository.getInstance();
 
         lvData = (ListView) findViewById(R.id.lvData);
+        assert lvData != null;
         lvData.setOnItemClickListener(this);
         lvData.setOnItemLongClickListener(this);
 
@@ -88,6 +89,7 @@ public class MainActivity extends AppCompatActivity
         //imageViewCart.setOnClickListener(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        assert fab != null;
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,10 +101,12 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        assert drawer != null;
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        assert navigationView != null;
         navigationView.setNavigationItemSelectedListener(this);
         Button btnCart = (Button) findViewById(R.id.btnCart);
         //btnCart.setOnClickListener(this);
@@ -110,15 +114,7 @@ public class MainActivity extends AppCompatActivity
         //myPicasso = new MyPicasso(this);
         try {
             intf = MyRetrofit.getLink(this);
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
+        } catch (CertificateException | NoSuchAlgorithmException | IOException | KeyStoreException | KeyManagementException e) {
             e.printStackTrace();
         }
 
@@ -139,6 +135,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        setCustomerName();
     }
 
     @Override
@@ -159,6 +156,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        assert drawer != null;
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         }
@@ -217,6 +215,28 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void setCustomerName() {
+        Customer customer = Repository.getCustomer();
+        //View navHeader = getLayoutInflater().inflate(R.layout.nav_header_main, null);
+
+        String userName = "";
+        String userEmail = "";
+        if (customer != null && customer.getId() != null) {
+            userName = customer.getName() + " " + customer.getS_name();
+            userEmail = customer.getEmail();
+        }
+        //((TextView)navHeader.findViewById(R.id.textUserName)).setText(userName);
+
+        NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        assert mNavigationView != null;
+        View headerLayout = mNavigationView.inflateHeaderView(R.layout.nav_header_main);
+
+//        // Now you can update the views in your header as you want :
+        TextView textUserName = (TextView) headerLayout.findViewById(R.id.textUserName);
+        textUserName.setText(userName);
+        TextView textEmail = (TextView) headerLayout.findViewById(R.id.textEmail);
+        textEmail.setText(userEmail);
+    }
 
     private void getAdapter(int id) {
         if (id == R.id.main) {
@@ -228,16 +248,9 @@ public class MainActivity extends AppCompatActivity
             getCart(1);
             //Intent intent = new Intent(this, CartActivity.class);
             //startActivity(intent);
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        } else if (id == R.id.signin) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
         }
     }
 
@@ -292,6 +305,7 @@ public class MainActivity extends AppCompatActivity
         }
 */
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        assert drawer != null;
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -343,7 +357,7 @@ public class MainActivity extends AppCompatActivity
         currentBlok = R.id.history;
         createFooter("",0);
         if(intf == null) return;
-        Map<String,Integer> map = new HashMap<String,Integer>();
+        Map<String, Integer> map = new HashMap<>();
         map.put("idCustomer", 1);
         //call = intf.getOrders(map);
         call = intf.getOrders();
@@ -538,7 +552,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         ((TextView)footer.findViewById(R.id.tvText)).setText(text);
-        ((Button)footer.findViewById(R.id.btnSentOrder)).setOnClickListener(this);
+        footer.findViewById(R.id.btnSentOrder).setOnClickListener(this);
 
         if (visible ==0){
             footer.setVisibility(View.INVISIBLE);
@@ -563,7 +577,7 @@ public class MainActivity extends AppCompatActivity
         //call = intf.sentOrder(gson.toJson(repository.getCart()));
 
         //call = intf.postWithJson(repository.getCart());
-        Cart cart = repository.getCart();
+        Cart cart = Repository.getCart();
         if (cart.getOrderDetails().size() > 0) {
             callRB = intf.sentOrder(cart);
             //call = intf.sentOrder(gson.toJson(repository.getCart()));
@@ -603,7 +617,7 @@ public class MainActivity extends AppCompatActivity
                         String respBody = response.body().string();
                         OrdersContainer resp = gson.fromJson(respBody,OrdersContainer.class);//асинхронный вызов
                         if (resp.getSuccess() == 1 ) {
-                            repository.clearOrderDetails();
+                            Repository.clearOrderDetails();
                             getCart(0);
                             //CartActivity.this.recreate();
                         }
