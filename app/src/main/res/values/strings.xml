@@ -25,4 +25,5 @@
     </string>
     <string name="action_sign_out">sign out</string>
     <string name="nameCustomer">sign out</string>
+    <string name="title_activity_customer">Customer</string>
 </resources>

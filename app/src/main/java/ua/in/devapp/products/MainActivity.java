@@ -1,6 +1,5 @@
 package ua.in.devapp.products;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.MatrixCursor;
 import android.os.Bundle;
@@ -15,6 +14,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.Toolbar;
+import android.text.Spanned;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,7 +41,6 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 import ua.in.devapp.products.api.Link;
 import ua.in.devapp.products.api.MyRetrofit;
 import ua.in.devapp.products.models.Cart;
@@ -56,8 +55,8 @@ import ua.in.devapp.products.view.OrdersListAdapter;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
+    private static final int REQUEST_CODE_CUSTOMER = 1;
     private Gson gson;
-    private Retrofit retrofit;
     private Link intf;
     private Call<Object> call;
     private Call<ResponseBody> callRB;
@@ -69,6 +68,11 @@ public class MainActivity extends AppCompatActivity
     private View footer;
     private int currentBlok;
     private boolean backPressToExit;
+
+    private NavigationView navigationView;
+    private View headerLayout;
+    TextView textUserName;
+    TextView textEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,11 +109,20 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setOnClickListener(this);
         assert navigationView != null;
         navigationView.setNavigationItemSelectedListener(this);
+        headerLayout = navigationView.getHeaderView(0);
+        textUserName = (TextView) headerLayout.findViewById(R.id.textUserName);
+        textEmail = (TextView) headerLayout.findViewById(R.id.textEmail);
+
+        textUserName.setOnClickListener(this);
+        textEmail.setOnClickListener(this);
+
         Button btnCart = (Button) findViewById(R.id.btnCart);
         //btnCart.setOnClickListener(this);
+
         gson = MyRetrofit.getGson();
         //myPicasso = new MyPicasso(this);
         try {
@@ -200,16 +213,12 @@ public class MainActivity extends AppCompatActivity
             userEmail = customer.getEmail();
         }
         //((TextView)navHeader.findViewById(R.id.textUserName)).setText(userName);
-
-        NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
-        assert mNavigationView != null;
-        View headerLayout = mNavigationView.getHeaderView(0);
         //View headerLayout = mNavigationView.inflateHeaderView(R.layout.nav_header_main);
 
 //        // Now you can update the views in your header as you want :
-        TextView textUserName = (TextView) headerLayout.findViewById(R.id.textUserName);
-        textUserName.setText(userName);
-        TextView textEmail = (TextView) headerLayout.findViewById(R.id.textEmail);
+        String htmlTaggedString = "<u>" + userName + "</u>";
+        Spanned textSpan = android.text.Html.fromHtml(htmlTaggedString);
+        textUserName.setText(textSpan);
         textEmail.setText(userEmail);
     }
 
@@ -451,18 +460,38 @@ public class MainActivity extends AppCompatActivity
             case R.id.btnSentOrder:
                 sentOrder();
                 break;
-            case android.R.string.yes:
-                MainActivity.super.onBackPressed();
+            case R.id.textEmail:
+            case R.id.textUserName:
+                editCustomer();
                 break;
-
             default:
                 break;
 
         }
     }
 
-    public void onClick(DialogInterface arg0, int arg1) {
-        MainActivity.super.onBackPressed();
+    private void editCustomer() {
+        Intent intent = new Intent(this, CustomerActivity.class);
+        startActivityForResult(intent, REQUEST_CODE_CUSTOMER);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            setCustomerName();
+
+            switch (requestCode) {
+                case REQUEST_CODE_CUSTOMER:
+
+                    break;
+                default:
+                    break;
+            }
+
+            // если вернулось не ОК
+        } else {
+            Toast.makeText(this, "Wrong result", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void addToCart(View v) {
@@ -538,29 +567,6 @@ public class MainActivity extends AppCompatActivity
         Cart cart = Repository.getCart();
         if (cart.getOrderDetails().size() > 0) {
             callRB = intf.sentOrder(cart);
-            //call = intf.sentOrder(gson.toJson(repository.getCart()));
-
-//        Map<String, String> param = new HashMap<String, String>();
-//        StringReader reader = new StringReader(gson.toJson(repository.getCart()));
-//        JsonReader jsonReader = new JsonReader(reader);
-//        jsonReader.setLenient(true);
-
-            //JsonElement my_json=jsonParser.parse(jsonReader);
-            //gson.newJsonReader(repository.getCart()).setLenient(true);
-//        String toJson = gson.toJson(repository.getCart());
-//        toJson = "{\"orderDetails\":[{\"count\":1,\"id\":1,\"price\":200,\"sum\":200}],\"totalSum\":200}";
-//        param.put("param", toJson);
-
-//        Map<String, Cart> param = new HashMap<String, Cart>();
-//        param.put("pp1", repository.getCart());
-
-            //call = intf.postObjectStr(gson.toJson(repository.getCart()));
-
-            //call = intf.postObjectJson(gson.toJson(repository.getCart()));
-            //call = intf.postObjectJson(param);
-
-            //Executing Call
-            //call.enqueue(getCallbackEnqueue());
             callRB.enqueue(getCallbackEnqueueSentOrder());
         }
     }
@@ -580,18 +586,6 @@ public class MainActivity extends AppCompatActivity
                             //CartActivity.this.recreate();
                         }
 
-                        //{"success":1,"message":"OK"}
-                        //String resp = response.body().toString();
-                        //
-                        //int respCode = response.code();
-                        //String resp1="";
-//                        JsonContainer jsonContainer = gson.fromJson(response.body().toString(), JsonContainer.class);// из Json в Java
-//
-//                        //matrixCursor.addRow(new Object[]{1, "тест", 50, 30});
-//                        //for (Map.Entry e: map.entrySet()){
-//                        if (jsonContainer.getSuccess() == 1) {
-//                            lvData.setAdapter(new CustomListAdapter(MainActivity.this, jsonContainer.getProducts()));
-                        //}
                     } catch (Exception e){
                         e.printStackTrace();
                     }
