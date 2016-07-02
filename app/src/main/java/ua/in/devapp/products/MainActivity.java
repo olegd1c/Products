@@ -186,32 +186,6 @@ public class MainActivity extends AppCompatActivity
                 }, 2000);
             }
 
-            //super.onBackPressed();
-
-            /*
-            new AlertDialog.Builder(this)
-                    .setTitle("Really Exit?")
-                    .setMessage("Are you sure you want to exit?")
-                    .setNegativeButton(android.R.string.no, null)
-                    .setPositiveButton(android.R.string.yes, //(DialogInterface.OnClickListener) this
-
-                                    new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-
-                                        }
-
-
-
-
-                        public void onClick(DialogInterface arg0, int arg1) {
-                            MainActivity.super.onBackPressed();
-                        }
-
-                    }
-
-                    ).create().show();
-                    */
         }
     }
 
@@ -229,7 +203,8 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         assert mNavigationView != null;
-        View headerLayout = mNavigationView.inflateHeaderView(R.layout.nav_header_main);
+        View headerLayout = mNavigationView.getHeaderView(0);
+        //View headerLayout = mNavigationView.inflateHeaderView(R.layout.nav_header_main);
 
 //        // Now you can update the views in your header as you want :
         TextView textUserName = (TextView) headerLayout.findViewById(R.id.textUserName);
@@ -283,27 +258,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         getAdapter(id);
-/*
-        if (id == R.id.main) {
-            getProducts();
-        }
-        else if (id == R.id.history) {
-            getOrders();
-        }else if (id == R.id.cart) {
-            getCart(1);
-        } else if (id == R.id.nav_gallery) {
 
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-            //Intent intent = new Intent(this, CartActivity.class);
-            //startActivity(intent);
-        }
-*/
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         assert drawer != null;
         drawer.closeDrawer(GravityCompat.START);
@@ -358,9 +313,12 @@ public class MainActivity extends AppCompatActivity
         createFooter("",0);
         if(intf == null) return;
         Map<String, Integer> map = new HashMap<>();
-        map.put("idCustomer", 1);
-        //call = intf.getOrders(map);
-        call = intf.getOrders();
+        Customer customer = repository.getCustomer();
+        Integer idCustomer = 0;
+        if (customer != null) idCustomer = customer.getId();
+        map.put("idCustomer", idCustomer);
+        call = intf.getOrders(map);
+        //call = intf.getOrders();
         //Executing Call
         call.enqueue(getCallbackEnqueueOrders());
     }

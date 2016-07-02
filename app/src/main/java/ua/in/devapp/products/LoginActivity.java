@@ -288,6 +288,8 @@ public class LoginActivity extends AppCompatActivity implements TextView.OnEdito
                             Repository.setCustomer(resp.getCustomer());
                             LoginActivity.this.visibleView();
                             //CartActivity.this.recreate();
+                        } else {
+                            Toast.makeText(LoginActivity.this, resp.getMessage(), Toast.LENGTH_SHORT).show();
                         }
 
                         //{"success":1,"message":"OK"}
@@ -303,7 +305,7 @@ public class LoginActivity extends AppCompatActivity implements TextView.OnEdito
 //                            lvData.setAdapter(new CustomListAdapter(MainActivity.this, jsonContainer.getProducts()));
                         //}
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();//e.printStackTrace();
                     }
                 }
                 //else translated.setText("null");
