@@ -1,5 +1,6 @@
 package ua.in.devapp.products;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -51,7 +52,7 @@ public class CustomerActivity extends AppCompatActivity implements View.OnClickL
 
         edLogin = (EditText) findViewById(R.id.editTextLogin);
         edPassword = (EditText) findViewById(R.id.editTextPassword);
-        edAdress = (EditText) findViewById(R.id.editTextAdress);
+        edAdress = (EditText) findViewById(R.id.editTextAddress);
         edName = (EditText) findViewById(R.id.editTextname);
         edEmail = (EditText) findViewById(R.id.editTextEmail);
         edPhone = (EditText) findViewById(R.id.editTextPhone);
@@ -144,6 +145,9 @@ public class CustomerActivity extends AppCompatActivity implements View.OnClickL
                         CustomerContainer resp = gson.fromJson(respBody, CustomerContainer.class);//асинхронный вызов
                         if (resp.getSuccess() == 1) {
                             Repository.setCustomer(resp.getCustomer());
+                            Intent intent = new Intent();
+                            setResult(RESULT_OK, intent);
+                            CustomerActivity.this.finish();
                         } else {
                             Toast.makeText(CustomerActivity.this, resp.getMessage(), Toast.LENGTH_SHORT).show();
                         }

@@ -20,6 +20,11 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="login" />
+
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -28,6 +33,10 @@
                 android:ems="100"
                 android:id="@+id/editTextLogin" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="password" />
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -36,6 +45,10 @@
                 android:ems="100"
                 android:id="@+id/editTextPassword" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="name" />
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -52,6 +65,10 @@
                 android:ems="100"
                 android:id="@+id/editTextSname" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="email" />
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -60,6 +77,10 @@
                 android:ems="100"
                 android:id="@+id/editTextEmail" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="phone" />
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -68,13 +89,17 @@
                 android:ems="100"
                 android:id="@+id/editTextPhone" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="address" />
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="none"
                 android:text="Adress"
                 android:ems="100"
-                android:id="@+id/editTextAdress" />
+                android:id="@+id/editTextAddress" />
 
             <Button
                 android:layout_width="wrap_content"

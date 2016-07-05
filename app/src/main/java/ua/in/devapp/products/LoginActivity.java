@@ -21,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -81,12 +82,16 @@ public class LoginActivity extends AppCompatActivity implements TextView.OnEdito
     private View mLoginFormView;
     private Button mEmailSignInButton;
     private Button mEmailSignOut;
+    private LinearLayout layoutIn;
+    private LinearLayout layoutOut;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
+        layoutOut = (LinearLayout) findViewById(R.id.email_login_form_out);
+        layoutIn = (LinearLayout) findViewById(R.id.email_login_form);
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         //populateAutoComplete();
 
@@ -146,11 +151,25 @@ public class LoginActivity extends AppCompatActivity implements TextView.OnEdito
         }
 
         if (!signIn) {
-            mEmailSignInButton.setVisibility(View.VISIBLE);
-            mEmailSignOut.setVisibility(View.INVISIBLE);
+            layoutIn.setVisibility(View.VISIBLE);
+            layoutOut.setVisibility(View.INVISIBLE);
+//            RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+//                    ViewGroup.LayoutParams.WRAP_CONTENT);
+//            p.addRule(RelativeLayout.BELOW, R.id.email_login_form);
+//            layoutOut.setLayoutParams(p);
         } else {
-            mEmailSignInButton.setVisibility(View.INVISIBLE);
-            mEmailSignOut.setVisibility(View.VISIBLE);
+            layoutOut.setVisibility(View.VISIBLE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                layoutOut.setTop(0);
+            }
+            layoutIn.setVisibility(View.INVISIBLE);
+//            RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+//                    ViewGroup.LayoutParams.WRAP_CONTENT);
+//
+//            p.addRule(RelativeLayout.BELOW, R.id.email_login_form_out);
+//            layoutIn.setLayoutParams(p);
+            //mEmailSignOut.setVisibility(View.VISIBLE);
+
         }
 
     }

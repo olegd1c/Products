@@ -490,7 +490,7 @@ public class MainActivity extends AppCompatActivity
 
             // если вернулось не ОК
         } else {
-            Toast.makeText(this, "Wrong result", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_update_customer, Toast.LENGTH_SHORT).show();
         }
     }
 
