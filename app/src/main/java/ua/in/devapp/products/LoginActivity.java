@@ -305,7 +305,8 @@ public class LoginActivity extends AppCompatActivity implements TextView.OnEdito
                         if (resp.getSuccess() == 1) {
                             //repository.clearOrderDetails();
                             Repository.setCustomer(resp.getCustomer());
-                            LoginActivity.this.visibleView();
+                            LoginActivity.this.finish();
+                            //LoginActivity.this.visibleView();
                             //CartActivity.this.recreate();
                         } else {
                             Toast.makeText(LoginActivity.this, resp.getMessage(), Toast.LENGTH_SHORT).show();

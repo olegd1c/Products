@@ -122,11 +122,9 @@ public class OrderActivity extends AppCompatActivity implements View.OnClickList
     private void getOrder() {
         createHeader();
 
-
-
         if(intf == null) return;
         Map<String, String> map = new HashMap<>();
-        map.put("idOrder", Integer.toString(repository.getOrder(idOrder).getId()));
+        map.put("idOrder", String.valueOf(repository.getOrder(idOrder).getId()));
         //call = intf.getOrders(map);
         call = intf.getOrderDetails(map);
         //Executing Call

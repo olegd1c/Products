@@ -94,6 +94,12 @@ public class Repository {
         products.put(mapProduct.getId(),mapProduct);
     }
 
+    public void addMapProducts(List<Product> listData) {
+        for (Product item : listData) {
+            addMapProduct(item);
+        }
+    }
+
     public Product getProduct(Integer id) {
         return products.get(id);
     }
