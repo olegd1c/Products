@@ -1,6 +1,7 @@
 package ua.in.devapp.products;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -12,8 +13,23 @@ import ua.in.devapp.products.models.Product;
 
 public class Repository {
     private static Repository rep = new Repository();
-    //private static Context context;
 
+    public List<Product> getAllProducts() {
+        return allProducts;
+    }
+
+    public void setAllProducts(List<Product> allProducts) {
+        this.allProducts = allProducts;
+    }
+
+    public void addAllProducts(List<Product> jProducts) {
+        for (Product item : jProducts) {
+            this.allProducts.add(item);
+        }
+    }
+
+    //private static Context context;
+    private static List<Product> allProducts = new LinkedList<>();
     public List<Order> getOrders() {
         return orders;
     }

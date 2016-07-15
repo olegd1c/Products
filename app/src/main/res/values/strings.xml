@@ -27,4 +27,5 @@
     <string name="nameCustomer">sign out</string>
     <string name="title_activity_customer">Customer</string>
     <string name="error_update_customer">Error update customer</string>
+    <string name="next_product">next product</string>
 </resources>

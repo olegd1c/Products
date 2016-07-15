@@ -18,6 +18,7 @@ import android.text.Spanned;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -53,7 +54,7 @@ import ua.in.devapp.products.view.CustomListAdapter;
 import ua.in.devapp.products.view.OrdersListAdapter;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, AbsListView.OnScrollListener {
 
     private static final int REQUEST_CODE_CUSTOMER = 1;
     private Gson gson;
@@ -71,8 +72,13 @@ public class MainActivity extends AppCompatActivity
 
     private NavigationView navigationView;
     private View headerLayout;
-    TextView textUserName;
-    TextView textEmail;
+    private TextView textUserName;
+    private TextView textEmail;
+    private Button btnNextProduct;
+    Integer lastPositionData;
+
+    private int limitStart;
+    private static final int LIMIT_RECORD = 4;//limit_record
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,12 +88,16 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-       repository = Repository.getInstance();
+        repository = Repository.getInstance();
 
+        btnNextProduct = (Button) findViewById(R.id.btnNextProduct);
+        btnNextProduct.setOnClickListener(this);
         lvData = (ListView) findViewById(R.id.lvData);
         assert lvData != null;
         lvData.setOnItemClickListener(this);
         lvData.setOnItemLongClickListener(this);
+        lvData.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
+        lvData.setOnScrollListener(this);
 
         //imageViewCart = (ImageView) findViewById(R.id.imageViewCart);
         //imageViewCart.setOnClickListener(this);
@@ -276,11 +286,15 @@ public class MainActivity extends AppCompatActivity
 
     private void getProducts() {
         currentBlok = R.id.main;
-        createFooter("",0);
+        createFooter("", 0);
         createHeader(0);
         if(intf == null) return;
-
-        call = intf.getProducts();
+        Map<String, String> param = new HashMap<>();
+        param.put("limit_record", String.valueOf(LIMIT_RECORD));
+        if (limitStart > 0) {
+            param.put("limit_start", String.valueOf(limitStart));
+        }
+        call = intf.getProducts(param);
         //Executing Call
         call.enqueue(getCallbackEnqueueProducts());
     }
@@ -299,9 +313,18 @@ public class MainActivity extends AppCompatActivity
                         //matrixCursor.addRow(new Object[]{1, "тест", 50, 30});
                         //for (Map.Entry e: map.entrySet()){
                         if (jsonContainer.getSuccess() == 1) {
-                            lvData.setAdapter(new CustomListAdapter(MainActivity.this, jsonContainer.getProducts()));
-                            lvData.setOnItemClickListener(MainActivity.this);
-                            lvData.setOnItemLongClickListener(MainActivity.this);
+
+                            if (jsonContainer.getProducts().size() > 0) {
+                                repository.addAllProducts(jsonContainer.getProducts());
+
+                                lvData.setAdapter(new CustomListAdapter(MainActivity.this, repository.getAllProducts()));//jsonContainer.getProducts()
+                                lvData.setOnItemClickListener(MainActivity.this);
+                                lvData.setOnItemLongClickListener(MainActivity.this);
+                                if (lastPositionData > 0)
+                                    lvData.setSelection(lastPositionData);
+                            }
+                        } else {
+                            Toast.makeText(MainActivity.this, jsonContainer.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     } catch (Exception e){
                         e.printStackTrace();
@@ -464,10 +487,22 @@ public class MainActivity extends AppCompatActivity
             case R.id.textUserName:
                 editCustomer();
                 break;
+            case R.id.btnNextProduct:
+                nextProduct();
+                break;
             default:
                 break;
 
         }
+    }
+
+    private void nextProduct() {
+        addLimitStart();
+        getProducts();
+    }
+
+    private void addLimitStart() {
+        limitStart = limitStart + LIMIT_RECORD;
     }
 
     private void editCustomer() {
@@ -600,7 +635,6 @@ public class MainActivity extends AppCompatActivity
         };
     }
 
-
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (currentBlok == R.id.history){
@@ -619,5 +653,22 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         return false;
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+        if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE
+                && (lvData.getLastVisiblePosition() - lvData.getHeaderViewsCount() -
+                lvData.getFooterViewsCount()) >= (lvData.getAdapter().getCount() - 1)) {
+            // Now your listview has hit the bottom
+            lastPositionData = lvData.getLastVisiblePosition();//lvData.getFooterViewsCount();
+            addLimitStart();
+            getProducts();
+        }
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
     }
 }
