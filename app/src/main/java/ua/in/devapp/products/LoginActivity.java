@@ -139,8 +139,8 @@ public class LoginActivity extends AppCompatActivity implements TextView.OnEdito
         visibleView();
 
         //test
-        mEmailView.setText("oleg_1c@ukr.net");
-        mPasswordView.setText("12345");
+        mEmailView.setText("");
+        mPasswordView.setText("");
     }
 
     private void visibleView() {
